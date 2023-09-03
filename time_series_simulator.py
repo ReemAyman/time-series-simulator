@@ -8,6 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 random.seed(22)
 
 
+# 1. Time index is a range of equally-spaced time points
 def generate_time_series(start_date, end_date, freq):
     """
     Generate a time index (DatetimeIndex) with the specified frequency.
@@ -23,7 +24,7 @@ def generate_time_series(start_date, end_date, freq):
     date_rng = pd.date_range(start=start_date, end=end_date, freq=freq)
     return date_rng
 
-
+# 2. Add seasonality: weekly
 def add_weekly_seasonality(data, seasonality, season_type):
     """
     Add weekly seasonality component to the time series data.
@@ -42,7 +43,7 @@ def add_weekly_seasonality(data, seasonality, season_type):
         seasonal_component = np.zeros(len(data)) if season_type == 'additive' else np.ones(len(data))
     return pd.Series(seasonal_component)
 
-
+# 3. Add seasonality: daily
 def add_daily_seasonality(data, seasonality, season_type):
     """
     Add seasonality component to the time series data.
@@ -62,11 +63,14 @@ def add_daily_seasonality(data, seasonality, season_type):
     return pd.Series(seasonal_component)
 
 
+# 4. Add trend
 def add_trend(data, trend, data_size, data_type):
     """
     Add trend component to the time series data.
 
     Parameters:
+        data_type:
+        data_size:
         data (DatetimeIndex): The time index for the data.
         trend (str): The magnitude of the trend ('No Trend', 'Small Trend', 'Large Trend').
 
