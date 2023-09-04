@@ -6,8 +6,8 @@ from time_series_components_generator.irregularity_components.missing_values.mis
 class MissingValuesByPercentage(MissingValues):
     """Class for missing values in data by percentage."""
 
-    def __init__(self, percentage_missing: float = 0.05):
-        super().__init__(self.data_component_values)
+    def __init__(self, data_component_values: np.ndarray, percentage_missing: float = 0.05):
+        super().__init__(data_component_values)
         self.percentage_missing = percentage_missing
 
     def generate_missing_values(self) -> np.ndarray:

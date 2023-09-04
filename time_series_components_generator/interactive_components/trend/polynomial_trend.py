@@ -13,7 +13,7 @@ class PolynomialTrend(Trend):
         Args:
             data_coefficients: a numpy array of coefficients [a0, a1, a2, ...] of the polynomial equation (a0 + a1*t + a2*t^2 + ....)
         """
-        super().__init__(self.time_interval_data, self.data_type)
+        super().__init__(self.time_interval_data)
         self.data_coefficients = data_coefficients
 
     def generate_data_component(self) -> Series:
@@ -22,12 +22,13 @@ class PolynomialTrend(Trend):
         Returns:
             pandas.Series: The polynomial trend component of the time series.
         """
-        trend_polynomial_component = 0
-        current_data_interval = np.ones(self.time_interval_data)
+        if self.data_coefficients is not None:
+            trend_polynomial_component = 0
+            current_data_interval = np.ones(self.time_interval_data)
 
-        # Calculate the trend polynomial component by multiplying the coefficient by the corresponding polynomial power
-        for coefficient in self.data_coefficients:
-            trend_polynomial_component += coefficient * current_data_interval
-            current_data_interval *= self.time_interval_data
+            # Calculate the trend polynomial component by multiplying the coefficient by the corresponding polynomial power
+            for coefficient in self.data_coefficients:
+                trend_polynomial_component += coefficient * current_data_interval
+                current_data_interval *= self.time_interval_data
 
         return Series(trend_polynomial_component)

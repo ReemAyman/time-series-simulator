@@ -14,7 +14,5 @@ class QuarterlySeasonality(Seasonality):
             pandas.Series: The weekly seasonal component of the time series.
         """
         seasonal_quarterly_component = np.sin(2 * np.pi * (self.time_interval_data.quarter - 1) / 4)
-        if self.data_type == "Additive":
-            seasonal_quarterly_component += 1
 
         return Series(seasonal_quarterly_component)

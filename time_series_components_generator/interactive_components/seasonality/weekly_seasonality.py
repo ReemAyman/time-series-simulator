@@ -14,7 +14,5 @@ class WeeklySeasonality(Seasonality):
             pandas.Series: The weekly seasonal component of the time series.
         """
         seasonal_weekly_component = np.sin(2 * np.pi * self.time_interval_data.dayofweek / 7)
-        if self.data_type == "Additive":
-            seasonal_weekly_component += 1
 
         return Series(seasonal_weekly_component)

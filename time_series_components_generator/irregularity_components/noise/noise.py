@@ -11,7 +11,7 @@ class Noise(ABC):
         Args:
             data_component_values: the data component after constructing seasonality, cyclicity, and trend across time intervals.
         """
-        self.component_data = data_component_values
+        self.data_component_values = data_component_values
 
     @abstractmethod
     def generate_noise(self) -> np.ndarray:

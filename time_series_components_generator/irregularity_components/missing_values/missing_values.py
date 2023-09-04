@@ -7,7 +7,7 @@ class MissingValues(ABC):
 
     def __init__(self, data_component_values: np.ndarray):
         """
-        Initializing missing values for time series data.
+            Initializing missing values for time series data.
         Args:
             data_component_values: the data component after constructing seasonality, cyclicity, and trend across time intervals.
         """
