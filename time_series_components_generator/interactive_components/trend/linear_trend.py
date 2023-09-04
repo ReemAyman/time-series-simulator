@@ -15,7 +15,12 @@ class LinearTrend(Trend):
             data_coefficients: a numpy array of coefficients [slope(-1,1), magnitude] of the trend.
         """
         super().__init__(time_interval_data)
-        self.data_coefficients = data_coefficients
+        if data_coefficients[0] != -1 and data_coefficients[0] != 1:
+            raise ValueError("LinearTrend: Slope should be 1 or -1.")
+        elif data_coefficients[1] < 0:
+            raise ValueError("LinearTrend: Magnitude should be greater or equal to zero.")
+        else:
+            self.data_coefficients = data_coefficients
 
     def generate_data_component(self) -> Series:
         """

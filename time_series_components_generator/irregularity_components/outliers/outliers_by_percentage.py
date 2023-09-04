@@ -14,7 +14,10 @@ class OutliersByPercentage(Outliers):
             percentage_outliers: the percentage of the outliers across the generated data.
         """
         super().__init__(data_component_values)
-        self.percentage_outliers = percentage_outliers
+        if 0 <= percentage_outliers <= 1:
+            self.percentage_outliers = percentage_outliers
+        else:
+            raise ValueError("OutliersByPercentage: Percentage value should be of range [0, 1]")
 
     def generate_outliers(self) -> np.ndarray:
         """

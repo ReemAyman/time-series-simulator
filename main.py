@@ -21,19 +21,21 @@ def generate_dataset_from_config() -> None:
         Generate datasets from configurations and saving into the targeted source.
     """
     # Reading the data configuration from a YAML file
+    # -------------------------------------------------------
     yaml_file_reader = YamlConfigurationReader('data_config.yaml')
     init_data = yaml_file_reader.read_data()
+    # -------------------------------------------------------
     datasets_number = init_data["datasets_number"]
 
     data_time_intervals = TimeIntervalGenerator(init_data["start_date"], init_data["end_date"],
                                                 init_data["frequency"]).generate_time_interval()
     seasonalities = SeasonalityFactory(data_time_intervals).generate_components()
     trends = TrendFactory(time_intervals=data_time_intervals, trend_parameters=init_data["trend"]).generate_components()
-
+    curr_seasonality = init_data["seasonality"]
+    curr_trend = init_data["trend"]
+    # --------------------------------------------------------------
     # Iterating over the number of datasets generated
     for dataset_count in range(datasets_number):
-        curr_seasonality = init_data["seasonality"]
-        curr_trend = init_data["trend"]
         for seasonality in curr_seasonality:
             for trend in curr_trend.keys():
 
@@ -66,6 +68,7 @@ def generate_dataset_from_config() -> None:
 
                 # Save data into csv file
                 TimeSeriesDataStoreCSV(data_series_values, data_time_intervals, str(dataset_count)).store_data()
+
 
 
 def main():

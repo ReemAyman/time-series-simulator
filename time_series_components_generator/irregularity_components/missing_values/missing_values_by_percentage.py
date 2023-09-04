@@ -8,7 +8,10 @@ class MissingValuesByPercentage(MissingValues):
 
     def __init__(self, data_component_values: np.ndarray, percentage_missing: float = 0.05):
         super().__init__(data_component_values)
-        self.percentage_missing = percentage_missing
+        if 0 <= percentage_missing <= 1:
+            self.percentage_missing = percentage_missing
+        else:
+            raise ValueError("MissingValuesByPercentage: Percentage value should be of range [0, 1]")
 
     def generate_missing_values(self) -> np.ndarray:
         """

@@ -15,7 +15,10 @@ class LinearNoise(Noise):
             percentage_of_magnitude: the percentage of the noise from the generated data.
         """
         super().__init__(data_component_values)
-        self.percentage_of_magnitude = percentage_of_magnitude
+        if 0 <= percentage_of_magnitude <= 1:
+            self.percentage_of_magnitude = percentage_of_magnitude
+        else:
+            raise ValueError("LinearNoise: Percentage value should be of range [0, 1]")
 
     def generate_noise(self) -> np.ndarray:
         """
@@ -27,4 +30,4 @@ class LinearNoise(Noise):
         noise_values = np.zeros_like(self.data_component_values)
         for i in range(len(self.data_component_values)):
             noise_values[i] = np.random.normal(0, abs(self.data_component_values[i]) * self.percentage_of_magnitude)
-        return (self.data_component_values + noise_values)[:, 0]
+        return self.data_component_values + noise_values
