@@ -25,10 +25,10 @@ def generate_dataset_from_config() -> None:
     init_data = yaml_file_reader.read_data()
     datasets_number = init_data["datasets_number"]
 
-    data_time_intervals = TimeIntervalGenerator(init_data["start_time"], init_data["end_time"],
+    data_time_intervals = TimeIntervalGenerator(init_data["start_date"], init_data["end_date"],
                                                 init_data["frequency"]).generate_time_interval()
     seasonalities = SeasonalityFactory(data_time_intervals).generate_components()
-    trends = TrendFactory(data_time_intervals, init_data["trend"]).generate_components()
+    trends = TrendFactory(time_intervals=data_time_intervals, trend_parameters=init_data["trend"]).generate_components()
 
     # Iterating over the number of datasets generated
     for dataset_count in range(datasets_number):
@@ -56,13 +56,13 @@ def generate_dataset_from_config() -> None:
 
                 # Generate noise, outliers and missing data
                 noises = NoiseFactory(data_series_values, init_data["noise"]).generate_components()
-                data_series_values = noises[init_data["noise"].keys()[0]].generate_noise()
+                data_series_values = noises[list(init_data["noise"].keys())[0]].generate_noise()
 
                 outliers = OutliersFactory(data_series_values, init_data["outlier"]).generate_components()
-                data_series_values = outliers[init_data["outlier"].keys()[0]].generate_outliers()
+                data_series_values = outliers[list(init_data["outlier"].keys())[0]].generate_outliers()
 
                 missing_values = MissingValuesFactory(data_series_values, init_data["missing"]).generate_components()
-                data_series_values = missing_values[init_data["missing"].keys()[0]].generate_missing_values()
+                data_series_values = missing_values[list(init_data["missing"].keys())[0]].generate_missing_values()
 
                 # Save data into csv file
                 TimeSeriesDataStoreCSV(data_series_values, data_time_intervals, str(dataset_count)).store_data()

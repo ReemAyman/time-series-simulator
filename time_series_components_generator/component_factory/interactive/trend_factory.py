@@ -3,7 +3,7 @@ from pandas import DatetimeIndex
 
 from time_series_components_generator.component_factory.interactive.interactive_component_factory import \
     InteractiveComponentFactory
-from time_series_components_generator.interactive_components.trend.polynomial_trend import PolynomialTrend
+from time_series_components_generator.interactive_components.trend.linear_trend import LinearTrend
 
 
 class TrendFactory(InteractiveComponentFactory):
@@ -28,5 +28,5 @@ class TrendFactory(InteractiveComponentFactory):
         Returns:
              dict: A dictionary contains different types of trends.
         """
-        trend_dict = {"polynomial": PolynomialTrend(self.time_intervals, np.array(self.trend_parameters["polynomial"]))}
+        trend_dict = {"linear": LinearTrend(self.time_intervals, np.array(self.trend_parameters["linear"]))}
         return trend_dict
