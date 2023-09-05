@@ -70,7 +70,6 @@ def generate_dataset_from_config() -> None:
                 TimeSeriesDataStoreCSV(data_series_values, data_time_intervals, str(dataset_count)).store_data()
 
 
-
 def main():
     generate_dataset_from_config()
 
