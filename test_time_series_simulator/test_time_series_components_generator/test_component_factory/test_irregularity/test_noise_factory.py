@@ -5,7 +5,7 @@ import numpy as np
 from time_series_components_generator.component_factory.irregularity.irregularity_component_factory import \
     IrregularityComponentFactory
 from time_series_components_generator.component_factory.irregularity.noise_factory import NoiseFactory
-from time_series_components_generator.irregularity_components.noise.linear_noise import LinearNoise
+from time_series_components_generator.trasformers.noise.linear_noise import LinearNoise
 
 
 class TestNoiseFactory(unittest.TestCase):

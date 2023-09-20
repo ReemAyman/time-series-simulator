@@ -13,6 +13,7 @@ class DailySeasonality(Seasonality):
         Returns:
             pandas.Series: The daily seasonal component of the time series.
         """
-        seasonal_daily_component = np.sin(2 * np.pi * self.time_interval_data.hour / 24)
+        seasonal_daily_component = self.amplitude * np.sin(
+                2 * np.pi * ((self.time_interval_data.hour + 1) / (24 * self.seasonality_multiplier)) + self.phase_shift)
 
         return Series(seasonal_daily_component)

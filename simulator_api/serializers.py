@@ -24,19 +24,19 @@ class DatasetConfigurationSerializer(serializers.ModelSerializer):
                   'outlier_percentage', 'noise_level', 'cycle_amplitude',
                   'cycle_frequency', 'producing_status', 'seasonality_components')
 
-    def update(self, instance, validated_data):
-        """
-            Overriding the update method to change 'producing type.'
-        Args:
-            instance: the data instance after filtration in the view.
-            validated_data: the data passed in the request body, serialized, and validated.
-
-        Returns:
-            the data instance after updating.
-        """
-        instance.producing_status = validated_data.get('producing_status', instance.producing_status)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     """
+    #         Overriding the update method to change 'producing type.'
+    #     Args:
+    #         instance: the data instance after filtration in the view.
+    #         validated_data: the data passed in the request body, serialized, and validated.
+    #
+    #     Returns:
+    #         the data instance after updating.
+    #     """
+    #     instance.producing_status = validated_data.get('producing_status', instance.producing_status)
+    #     instance.save()
+    #     return instance
 
 
 class SimulationDataSerializer(serializers.ModelSerializer):
@@ -47,8 +47,8 @@ class SimulationDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SimulationData
-        fields = ('name', 'start_date', 'end_date', 'type',
-                  'use_case_name', 'meta_data', 'producer_type', 'datasets')
+        fields = ('start_date', 'end_date', 'type', 'use_case_name',
+                  'meta_data', 'producer_type', 'process_id', 'datasets')
 
     def create(self, validated_data):
         """

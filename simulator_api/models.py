@@ -91,13 +91,13 @@ class SimulationData(models.Model):
     """
     A model for simulation data.
     """
-    name = models.CharField(max_length=20, unique=True)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     type = models.CharField(max_length=14, validators=[validate_time_series_type], default="additive")
-    use_case_name = models.CharField(max_length=50, default="UC-1")
+    use_case_name = models.CharField(max_length=50, unique=True)
     meta_data = models.CharField(max_length=200, default="")
     producer_type = models.CharField(max_length=9, validators=[validate_producer_type], default="csv")
+    process_id = models.IntegerField(default=-1)
 
 
 class DatasetConfiguration(models.Model):

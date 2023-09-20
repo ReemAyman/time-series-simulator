@@ -1,0 +1,25 @@
+---
+start_date: "2021-01-01"
+end_date: "2021-01-31"
+
+
+frequency: "1H"
+
+seasonality:
+  - seasonality: "Daily"
+    amplitude: 10
+    multiplier: 1 #number of days (ex : bi daily seasonality ----> multiplier= 2)
+    phase_shift: 0
+  - seasonality: "Weekly"
+    amplitude: 5
+    multiplier: 1 #number of weeks
+    phase_shift: 0
+
+noise_level: "Low"
+trend_coefficients: [1, 3]
+cyclic_period: 3  # length of period in years
+cyclic_amplitude: 0
+
+outliers_percentage: 0.1
+missings_percentage: 0.1
+data_type: "ADDITIVE"

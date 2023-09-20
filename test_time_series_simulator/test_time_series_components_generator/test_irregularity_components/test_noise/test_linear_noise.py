@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from time_series_components_generator.irregularity_components.noise.linear_noise import LinearNoise
+from time_series_components_generator.trasformers.noise.linear_noise import LinearNoise
 
 
 class TestLinearNoiseByPercentage(unittest.TestCase):

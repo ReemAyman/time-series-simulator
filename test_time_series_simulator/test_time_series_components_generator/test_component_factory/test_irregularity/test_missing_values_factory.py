@@ -5,8 +5,8 @@ import numpy as np
 from time_series_components_generator.component_factory.irregularity.irregularity_component_factory import \
     IrregularityComponentFactory
 from time_series_components_generator.component_factory.irregularity.missing_values_factory import MissingValuesFactory
-from time_series_components_generator.irregularity_components.missing_values.missing_values_by_percentage import \
-    MissingValuesByPercentage
+from time_series_components_generator.trasformers.missing_values_by_percentage import \
+    MissingValuesTransformer
 
 
 class TestMissingValuesFactory(unittest.TestCase):
@@ -23,7 +23,7 @@ class TestMissingValuesFactory(unittest.TestCase):
         self.assertTrue(self.missing_values_dict.__contains__("percentage"))
 
     def test_missing_value_generate_components_percentage_created_success(self):
-        self.assertIsInstance(self.missing_values_dict["percentage"], MissingValuesByPercentage)
+        self.assertIsInstance(self.missing_values_dict["percentage"], MissingValuesTransformer)
 
 
 if __name__ == '__main__':

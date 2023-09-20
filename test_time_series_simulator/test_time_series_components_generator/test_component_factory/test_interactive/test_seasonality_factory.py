@@ -6,8 +6,8 @@ from time_series_components_generator.component_factory.interactive.interactive_
     InteractiveComponentFactory
 from time_series_components_generator.component_factory.interactive.seasonality_factory import SeasonalityFactory
 from time_series_components_generator.interactive_components.seasonality.daily_seasonality import DailySeasonality
-from time_series_components_generator.interactive_components.seasonality.quarterly_seasonality import \
-    QuarterlySeasonality
+from time_series_components_generator.interactive_components.seasonality.monthly_seasonality import \
+    MonthlySeasonality
 from time_series_components_generator.interactive_components.seasonality.weekly_seasonality import WeeklySeasonality
 
 
@@ -36,7 +36,7 @@ class TestSeasonalityFactory(unittest.TestCase):
         self.assertIsInstance(self.seasonality_dict["weekly"], WeeklySeasonality)
 
     def test_seasonality_generate_components_quarterly_created_success(self):
-        self.assertIsInstance(self.seasonality_dict["quarterly"], QuarterlySeasonality)
+        self.assertIsInstance(self.seasonality_dict["quarterly"], MonthlySeasonality)
 
 
 if __name__ == '__main__':
