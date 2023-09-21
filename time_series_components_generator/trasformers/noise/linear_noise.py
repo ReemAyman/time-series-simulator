@@ -1,6 +1,5 @@
 import numpy as np
 
-from time_series_components_generator.trasformers.noise.noise_enum import NoiseEnum
 from time_series_components_generator.trasformers.transformer import Transformer
 
 
@@ -8,7 +7,7 @@ class LinearNoise(Transformer):
     """
         A class for generating linear noise.
     """
-    def __init__(self, noise_level: NoiseEnum):
+    def __init__(self, noise_level: float):
         """
             Initializing linear outliers by parameters needed.
         Args:
@@ -28,6 +27,6 @@ class LinearNoise(Transformer):
         """
         noise = np.zeros_like(data_component_values)
         for i in range(len(data_component_values)):
-            noise[i] = np.random.normal(0, abs(data_component_values[i]) * self.noise_level.value)\
-                if self.noise_level.value > 0 else 0
+            noise[i] = np.random.normal(0, abs(data_component_values[i]) * self.noise_level)\
+                if self.noise_level > 0 else 0
         return np.array((data_component_values + noise))

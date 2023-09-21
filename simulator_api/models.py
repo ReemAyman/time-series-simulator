@@ -73,14 +73,14 @@ def validate_producer_type(producer_type):
 
 def validate_time_series_type(time_series_type):
     """
-        Validate time series input [additive, multiplicative] created in a simulation instance.
+        Validate time series input [ADDITIVE, MULTIPLICATIVE] created in a simulation instance.
     Args:
         time_series_type: the producing status input.
 
     Returns:
         Raising an exception if it is not valid.
     """
-    if time_series_type != "additive" and time_series_type != "multiplicative":
+    if time_series_type != "ADDITIVE" and time_series_type != "MULTIPLICATIVE":
         raise ValidationError(
             _(f"{time_series_type} is not a valid time series type."),
             params={"value": time_series_type},

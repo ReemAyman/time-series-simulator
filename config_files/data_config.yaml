@@ -15,7 +15,7 @@ seasonality:
     multiplier: 1 #number of weeks
     phase_shift: 0
 
-noise_level: "Low"
+noise_level: 10
 trend_coefficients: [1, 3]
 cyclic_period: 3  # length of period in years
 cyclic_amplitude: 0
