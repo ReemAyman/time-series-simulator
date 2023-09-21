@@ -149,4 +149,5 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
     ),
     'SEARCH_PARAM': 'filter[search]',
+
 }

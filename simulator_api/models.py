@@ -93,7 +93,7 @@ class SimulationData(models.Model):
     """
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    type = models.CharField(max_length=14, validators=[validate_time_series_type], default="additive")
+    type = models.CharField(max_length=14, validators=[validate_time_series_type], default="ADDITIVE")
     use_case_name = models.CharField(max_length=50, unique=True)
     meta_data = models.CharField(max_length=200, default="")
     producer_type = models.CharField(max_length=9, validators=[validate_producer_type], default="csv")
