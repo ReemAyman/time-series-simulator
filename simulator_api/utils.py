@@ -36,6 +36,7 @@ class SimulatorRunner(Thread):
     def run(self) -> None:
         print(f"SimulatorRunner process initialized with process id {self.ident} ...")
 
+
         # Saving the data producer type and process id
         SimulationData.objects.filter(use_case_name=self.use_case_name).update(process_id=self.ident)
 

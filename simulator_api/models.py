@@ -91,20 +91,37 @@ class SimulationData(models.Model):
     """
     A model for simulation data.
     """
+    DATA_TYPE = [
+        ("ADDITIVE", "Additive"),
+        ("MULTIPLICATIVE", "Multiplicative"),
+    ]
+    PRODUCER_TYPE = [
+        ("csv", "csv"),
+        ("kafka", "Kafka"),
+    ]
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    type = models.CharField(max_length=14, validators=[validate_time_series_type], default="ADDITIVE")
+    # type = models.CharField(max_length=14, validators=[validate_time_series_type], default="ADDITIVE")
+    type = models.CharField(max_length=14, choices=DATA_TYPE, default="ADDITIVE")
     use_case_name = models.CharField(max_length=50, unique=True)
     meta_data = models.CharField(max_length=200, default="")
-    producer_type = models.CharField(max_length=9, validators=[validate_producer_type], default="csv")
-    process_id = models.IntegerField(default=-1)
+    # producer_type = models.CharField(max_length=9, validators=[validate_producer_type], default="csv")
+    producer_type = models.CharField(max_length=9, choices=PRODUCER_TYPE, default="csv")
+    process_id = models.BigIntegerField(default=-1)
 
 
 class DatasetConfiguration(models.Model):
     """
     A model for setting configurations for a single dataset.
     """
-    simulation_data = models.ForeignKey(SimulationData,  related_name='datasets', on_delete=models.CASCADE)
+    PRODUCING_STATUS = (
+        ("Submitted", "Submitted"),
+        ("Running", "Running"),
+        ("Succeeded", "Succeeded"),
+        ("Failed", "Failed"),
+    )
+
+    simulation_data = models.ForeignKey(SimulationData, related_name='datasets', on_delete=models.CASCADE)
     frequency = models.CharField(max_length=5)
     trend_coefficients = ArrayField(models.IntegerField(), default=[0])
     missing_percentage = models.FloatField(validators=[MaxValueValidator(1), MinValueValidator(0)])
@@ -112,15 +129,33 @@ class DatasetConfiguration(models.Model):
     noise_level = models.IntegerField()
     cycle_amplitude = models.IntegerField()
     cycle_frequency = models.IntegerField()
-    producing_status = models.CharField(max_length=14, validators=[validate_producing_status], default="Submitted")
+    # producing_status = models.CharField(max_length=14, validators=[validate_producing_status], default="Submitted")
+    producing_status = models.CharField(max_length=14, choices=PRODUCING_STATUS, default="Submitted")
 
 
 class SeasonalityModel(models.Model):
     """
     A model for setting a seasonality for a dataset.
     """
-    dataset_config = models.ForeignKey(DatasetConfiguration, related_name='seasonality_components', on_delete=models.CASCADE)
-    frequency = models.CharField(max_length=7, validators=[validate_seasonality_type])
+    SEASONALITY_FREQUENCY = [
+        ("Daily", "Daily"),
+        ("Weekly", "Weekly"),
+        ("Monthly", "Monthly"),
+    ]
+
+    dataset_config = models.ForeignKey(DatasetConfiguration, related_name='seasonality_components',
+                                       on_delete=models.CASCADE)
+    # frequency = models.CharField(max_length=7, validators=[validate_seasonality_type])
+    frequency = models.CharField(max_length=7, choices=SEASONALITY_FREQUENCY)
     multiplier = models.IntegerField()
     phase_shift = models.IntegerField()
     amplitude = models.IntegerField()
+
+
+class GeneratedDataset(models.Model):
+    """
+    A model for the generated dataset where each dataset is saved as json data.
+    """
+    generated_dataset = models.JSONField()
+    # timestamp = ArrayField(models.DateField())
+    # value = ArrayField(models.FloatField())

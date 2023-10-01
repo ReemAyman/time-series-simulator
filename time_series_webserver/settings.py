@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': 'time-series',
         'USER': 'postgres',
         'PASSWORD': 'r87hty5',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432'
     }
 }

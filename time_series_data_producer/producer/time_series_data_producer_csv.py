@@ -1,5 +1,7 @@
 import re
 
+import requests
+
 from time_series_data_producer.producer.time_series_data_producer import TimeSeriesDataProducer
 
 from pandas import DataFrame
@@ -32,3 +34,4 @@ class TimeSeriesDataProducerCSV(TimeSeriesDataProducer):
             Store time series data in a .csv file format.
         """
         self.generated_data.to_csv(self.identifier, encoding='utf-8', index=False)
+

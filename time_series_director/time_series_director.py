@@ -1,4 +1,7 @@
+import json
+
 import pandas as pd
+import requests
 
 from time_series_components_generator.time_series_builder_factory import TimeSeriesBuilderFactory
 from time_series_components_generator.trasformers.missing_values_by_percentage import MissingValuesTransformer
@@ -43,5 +46,17 @@ class TimeSeriesDirector:
             data_with_missings = MissingValuesTransformer(configurator.missings_percentage).transform(
                 data_with_outliers)
             final_dataframe = pd.DataFrame({'value': data_with_missings, 'timestamp': product.time_interval_data})
-
+            self.store_data_nifi(final_dataframe)
             yield final_dataframe
+
+    def store_data_nifi(self, df: pd.DataFrame):
+        """
+        Store the generated data in database through NiFi.
+        """
+        df = df.fillna('')
+        df['timestamp'] = df['timestamp'].astype(str)
+
+        # POST request call to nifi port
+        url = "http://host.docker.internal:5000"
+        requests.post(url=url, json={'generated_dataset': df.to_json()},
+                      headers={'content-type': 'application/json'})
