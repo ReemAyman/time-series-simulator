@@ -1,11 +1,12 @@
-from threading import Thread
+from multiprocessing import Process
+import psutil
 
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, get_object_or_404
 from rest_framework.response import Response
 
 from simulator_api.models import SimulationData
 from simulator_api.serializers import SimulationDataSerializer
-from simulator_api.utils import SimulatorRunner
+from simulator_api.utils import run_simulator
 
 
 class CreateSimulator(CreateAPIView):
@@ -14,15 +15,15 @@ class CreateSimulator(CreateAPIView):
     """
     serializer_class = SimulationDataSerializer
 
-    def create(self, request, *args, **kwargs):
-        simulator_serialized = SimulationDataSerializer(data=request.data)
-        if simulator_serialized.is_valid():
-            simulator_serialized.save()
-        global simulator_thread
-        simulator_thread = SimulatorRunner(simulator_config=simulator_serialized.data)
-        simulator_thread.deamon = False
-        simulator_thread.start()
-        return Response(simulator_serialized.data)
+    # def create(self, request, *args, **kwargs):
+    #     simulator_serialized = SimulationDataSerializer(data=request.data)
+    #     if simulator_serialized.is_valid():
+    #         simulator_serialized.save()
+    #     global simulator_thread
+    #     simulator_thread = SimulatorRunner(simulator_config=simulator_serialized.data)
+    #     simulator_thread.deamon = False
+    #     simulator_thread.start()
+    #     return Response(simulator_serialized.data)
 
 
 class ListSimulator(ListAPIView):
@@ -39,7 +40,7 @@ class RunSimulator(UpdateAPIView):
     """
     serializer_class = SimulationDataSerializer
     queryset = SimulationData.objects.all()
-    lookup_field = 'process_id'
+    lookup_field = 'id'
 
     def get_object(self):
         """
@@ -57,9 +58,17 @@ class RunSimulator(UpdateAPIView):
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
+        simulator_serialized = SimulationDataSerializer(instance).data
+        process = Process(target=run_simulator, args=(simulator_serialized,
+                                                      instance.producer_type,
+                                                      instance.id))
+        process.start()
+
+        self.queryset.filter(id=instance.id).update(process_id=process.pid)
         instance.datasets.all().update(producing_status="Running")
-        simulator_thread.process_started = True
-        return Response(SimulationDataSerializer(instance).data)
+
+        # simulator_thread.process_started = True
+        return Response(simulator_serialized)
 
 
 class StopSimulator(UpdateAPIView):
@@ -68,7 +77,7 @@ class StopSimulator(UpdateAPIView):
     """
     serializer_class = SimulationDataSerializer
     queryset = SimulationData.objects.all()
-    lookup_field = 'process_id'
+    lookup_field = 'id'
 
     def get_object(self):
         """
@@ -86,7 +95,12 @@ class StopSimulator(UpdateAPIView):
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
+        psutil.Process(instance.process_id).terminate()
+
+        self.queryset.filter(id=instance.id).update(process_id=-1)
         instance.datasets.all().update(producing_status="Failed")
-        if simulator_thread is not None:
-            simulator_thread.kill_process = True
+
+        # if simulator_thread is not None:
+        #     simulator_thread.kill_process = True
+
         return Response(SimulationDataSerializer(instance).data)
