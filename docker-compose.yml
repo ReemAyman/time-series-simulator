@@ -1,0 +1,72 @@
+version: "1.0"
+services:
+# Postgres service
+  db:
+    image: postgres
+    container_name: time-series-db
+    volumes:
+      - ./db/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=time-series
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=r87hty5
+    ports:
+      -  5433:5432
+    networks:
+      - simulator-network
+# Apache NiFi Service
+  apache-nifi-simulator:
+    image: apache/nifi:latest
+    container_name: time-series-nifi
+    volumes:
+      - ./drivers:/opt/nifi/nifi-current/drivers
+      - ./nifi/conf:/opt/conf
+      - ./nifi/nifi_state:/data/nifi/state
+    environment:
+      - SINGLE_USER_CREDENTIALS_USERNAME=admin
+      - SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+    ports:
+      - 8443:8443
+      - 5000:5000
+    networks:
+      - simulator-network
+# Simulator service
+  sim-api:
+    image: simulator:1.0
+    container_name: time-series-gen
+    command: >
+      bash -c " python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - generated-datasets:/simulator/generated_datasets
+      - migrations:/simulator/simulator_api/migrations
+    ports:
+      - 8000:8000
+    environment:
+      - POSTGRES_NAME=time-series
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=r87hty5
+    depends_on:
+      - db
+    networks:
+      - simulator-network
+
+volumes:
+  generated-datasets:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./generated_datasets
+  migrations:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./simulator_api/migrations
+
+networks:
+  simulator-network:
+    driver: bridge
