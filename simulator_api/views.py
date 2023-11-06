@@ -15,16 +15,6 @@ class CreateSimulator(CreateAPIView):
     """
     serializer_class = SimulationDataSerializer
 
-    # def create(self, request, *args, **kwargs):
-    #     simulator_serialized = SimulationDataSerializer(data=request.data)
-    #     if simulator_serialized.is_valid():
-    #         simulator_serialized.save()
-    #     global simulator_thread
-    #     simulator_thread = SimulatorRunner(simulator_config=simulator_serialized.data)
-    #     simulator_thread.deamon = False
-    #     simulator_thread.start()
-    #     return Response(simulator_serialized.data)
-
 
 class ListSimulator(ListAPIView):
     """
@@ -67,7 +57,6 @@ class RunSimulator(UpdateAPIView):
         self.queryset.filter(id=instance.id).update(process_id=process.pid)
         instance.datasets.all().update(producing_status="Running")
 
-        # simulator_thread.process_started = True
         return Response(simulator_serialized)
 
 
@@ -99,8 +88,5 @@ class StopSimulator(UpdateAPIView):
 
         self.queryset.filter(id=instance.id).update(process_id=-1)
         instance.datasets.all().update(producing_status="Failed")
-
-        # if simulator_thread is not None:
-        #     simulator_thread.kill_process = True
 
         return Response(SimulationDataSerializer(instance).data)

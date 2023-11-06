@@ -108,6 +108,7 @@ class SimulationData(models.Model):
     # producer_type = models.CharField(max_length=9, validators=[validate_producer_type], default="csv")
     producer_type = models.CharField(max_length=9, choices=PRODUCER_TYPE, default="csv")
     process_id = models.BigIntegerField(default=-1)
+    sink_id = models.CharField(max_length=200, default="")
 
 
 class DatasetConfiguration(models.Model):
@@ -131,6 +132,8 @@ class DatasetConfiguration(models.Model):
     cycle_frequency = models.IntegerField()
     # producing_status = models.CharField(max_length=14, validators=[validate_producing_status], default="Submitted")
     producing_status = models.CharField(max_length=14, choices=PRODUCING_STATUS, default="Submitted")
+    generator_id = models.CharField(max_length=200, default="")
+    feature_id = models.CharField(max_length=200, default="")
 
 
 class SeasonalityModel(models.Model):
@@ -157,5 +160,3 @@ class GeneratedDataset(models.Model):
     A model for the generated dataset where each dataset is saved as json data.
     """
     generated_dataset = models.JSONField()
-    # timestamp = ArrayField(models.DateField())
-    # value = ArrayField(models.FloatField())

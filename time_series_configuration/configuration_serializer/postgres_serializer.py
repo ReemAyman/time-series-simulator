@@ -34,5 +34,7 @@ class PostgresSerializer:
             "trend_coefficients": self.config_data["trend_coefficients"],
             "seasonality": self.config_data["seasonality_components"],
             "cyclic_period": self.config_data["cycle_frequency"],
-            "cyclic_amplitude": self.config_data["cycle_amplitude"]
+            "cyclic_amplitude": self.config_data["cycle_amplitude"],
+            "generator_id": self.config_data["generator_id"],
+            "feature_id": self.config_data["feature_id"]
         }

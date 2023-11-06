@@ -45,6 +45,7 @@ services:
     volumes:
       - generated-datasets:/simulator/generated_datasets
       - migrations:/simulator/simulator_api/migrations
+      - consumer-data:/simulator/consumer_data
     ports:
       - 8000:8000
     environment:
@@ -55,6 +56,39 @@ services:
       - db
     networks:
       - simulator-network
+# Kafka Confluent Service
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.1.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+          - simulator-network
+  kafka-broker:
+    image: confluentinc/cp-kafka:6.1.0
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://host.docker.internal:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data-producer:/kafka-data
+    networks:
+      - simulator-network
+    depends_on:
+      - sim-api
+      - zookeeper
 
 volumes:
   generated-datasets:
@@ -63,6 +97,12 @@ volumes:
       type: none
       o: bind
       device: ./generated_datasets
+  consumer-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./consumer_data
   migrations:
     driver: local
     driver_opts:
@@ -99,6 +139,18 @@ volumes:
       type: none
       o: bind
       device: ./nifi/nifi_provenance
+  kafka-data-producer:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./time_series_data_producer/producer
+#  kafka-data-consumer:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./time_series_data_producer/producer
 
 networks:
   simulator-network:

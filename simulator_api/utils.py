@@ -1,70 +1,12 @@
-# Global variable for the thread
-from threading import Thread
-
 from simulator_api.models import DatasetConfiguration, SimulationData
 from time_series_configuration.configuration_facade import ConfigurationFacade
 from time_series_configuration.configuration_reader.postgre_configuration_reader import PostgreReader
+from time_series_data_consumer.consumer.time_series_data_consumer_kafka import TimeSeriesDataConsumerKafka
 from time_series_data_producer.builder.producer_builder_csv import CsvProducerBuilder
+from time_series_data_producer.builder.producer_builder_kafka import KafkaProducerBuilder
 from time_series_data_producer.producer_factory import ProducerFactory
 from time_series_director.time_series_director import TimeSeriesDirector
 
-# global simulator_thread
-# simulator_thread = Thread()
-
-
-# class SimulatorRunner(Thread):
-#     """
-#         A thread for create, run, and stop the simulator (connected to the end points to the user requests).
-#     """
-#
-#     def __init__(self, simulator_config=None):
-#         Thread.__init__(self)
-#         # A flag parameter for stopping the process.
-#         self.kill_process = False
-#         self.data_producer = "csv"
-#
-#         self.simulator_director = self.get_data(simulator_config)
-#         self.use_case_name = simulator_config["use_case_name"]
-#
-#         self.datasets_ids = DatasetConfiguration.objects.filter(
-#             simulation_data_id=SimulationData.objects.get(use_case_name=self.use_case_name).id).values_list('id',
-#                                                                                                             flat=True)
-#
-#         # A flag parameter for starting the process.
-#         self.process_started = False
-#
-#     def run(self) -> None:
-#         print(f"SimulatorRunner process initialized with process id {self.ident} ...")
-#
-#         # Saving the data producer type and process id
-#         SimulationData.objects.filter(use_case_name=self.use_case_name).update(process_id=self.ident)
-#
-#         while True:
-#             if self.process_started:
-#                 print(f"SimulatorRunner process started with process id {self.ident} ...")
-#                 curr_index = 0
-#                 while not self.kill_process:
-#                     # Building the datasets according to the producer type.
-#                     for i, dataset in enumerate(self.simulator_director.build()):
-#                         producer_factory = ProducerFactory()
-#                         if self.data_producer == 'csv':
-#                             csv_producer_builder = CsvProducerBuilder()
-#                             producer_factory.register_builder("csv", csv_producer_builder(generated_data=dataset,
-#                                                                                           location=f"generated_datasets/test_dataset_{i}.csv"))
-#                             producer = producer_factory.create("csv",
-#                                                                location=f"generated_datasets/test_dataset_{i}.csv")
-#                             producer.store_data()
-#                             DatasetConfiguration.objects.filter(id=self.datasets_ids[i]).update(
-#                                 producing_status="Succeeded")
-#                             curr_index = i
-#
-#                 if self.kill_process:
-#                     print(f"SimulatorRunner process stopped with process id {self.ident} ...")
-#                     self.process_started = False
-#                     if curr_index >= len(self.datasets_ids):
-#                         DatasetConfiguration.objects.filter(id__in=self.datasets_ids[curr_index:]).update(
-#                             producing_status="Failed")
-#                 SimulationData.objects.filter(process_id=self.ident).update(process_id=-1)
 
 def run_simulator(simulator_config, data_producer, simulator_id):
     """
@@ -77,7 +19,7 @@ def run_simulator(simulator_config, data_producer, simulator_id):
         TimeSeriesDirector: the director that runs and generates the time series data.
     """
     datasets_ids = DatasetConfiguration.objects.filter(
-            simulation_data_id=simulator_id).values_list('id', flat=True)
+        simulation_data_id=simulator_id).values_list('id', flat=True)
 
     datasets = simulator_config["datasets"]
     list_of_configurators = []
@@ -95,6 +37,8 @@ def run_simulator(simulator_config, data_producer, simulator_id):
         config_data["cycle_amplitude"] = dataset["cycle_amplitude"]
         config_data["cycle_frequency"] = dataset["cycle_frequency"]
         config_data["seasonality_components"] = dataset["seasonality_components"]
+        config_data["generator_id"] = dataset["generator_id"]
+        config_data["feature_id"] = dataset["feature_id"]
         list_of_configurators.append(ConfigurationFacade(PostgreReader(config_data)))
 
     simulator_director = TimeSeriesDirector(list_of_configurators)
@@ -103,11 +47,16 @@ def run_simulator(simulator_config, data_producer, simulator_id):
         producer_factory = ProducerFactory()
         if data_producer == 'csv':
             csv_producer_builder = CsvProducerBuilder()
-            producer_factory.register_builder("csv",
-                                              csv_producer_builder(generated_data=dataset,
-                                                                   location=f"generated_datasets/test_dataset_{i}.csv"))
+            producer_factory.register_builder("csv", csv_producer_builder(generated_data=dataset, location=f"generated_datasets/test_dataset_{i}.csv"))
             producer = producer_factory.create("csv",
                                                location=f"generated_datasets/test_dataset_{i}.csv")
-            # DatasetConfiguration.objects.filter(id=datasets_ids[i]).update(
-            #     producing_status="Succeeded")
             producer.store_data()
+        else:
+            kafka_producer_builder = KafkaProducerBuilder()
+            producer_factory.register_builder("kafka", kafka_producer_builder(generated_data=dataset, topic=simulator_config["sink_id"],
+                                                                              generator_id=list_of_configurators[i].generator_id, feature_id=list_of_configurators[i].feature_id))
+            producer = producer_factory.create("kafka", topic=simulator_config["sink_id"],
+                                               generator_id=list_of_configurators[i].generator_id, feature_id=list_of_configurators[i].feature_id)
+            consumer = TimeSeriesDataConsumerKafka(simulator_config["sink_id"], dataset.shape[0])
+            producer.store_data()
+            consumer.consume_data()

@@ -1,6 +1,6 @@
-FROM python:3
+FROM python:3.8
 WORKDIR /simulator
 COPY requirements.txt /simulator
-RUN pip install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
 COPY . /simulator

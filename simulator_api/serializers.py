@@ -22,7 +22,8 @@ class DatasetConfigurationSerializer(serializers.ModelSerializer):
         model = DatasetConfiguration
         fields = ('frequency', 'trend_coefficients', 'missing_percentage',
                   'outlier_percentage', 'noise_level', 'cycle_amplitude',
-                  'cycle_frequency', 'producing_status', 'seasonality_components')
+                  'cycle_frequency', 'producing_status', 'seasonality_components',
+                  'generator_id', 'feature_id')
 
 
 class SimulationDataSerializer(serializers.ModelSerializer):
@@ -33,8 +34,8 @@ class SimulationDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SimulationData
-        fields = ('start_date', 'end_date', 'type', 'use_case_name',
-                  'meta_data', 'producer_type', 'process_id', 'datasets')
+        fields = ('start_date', 'end_date', 'type', 'use_case_name', 'meta_data',
+                  'producer_type', 'process_id', 'datasets', 'sink_id')
 
     def create(self, validated_data):
         """

@@ -46,9 +46,10 @@ class TimeSeriesDirector:
             data_with_missings = MissingValuesTransformer(configurator.missings_percentage).transform(
                 data_with_outliers)
             final_dataframe = pd.DataFrame({'value': data_with_missings, 'timestamp': product.time_interval_data})
-            self.store_data_nifi(final_dataframe)
+            # self.store_data_nifi(final_dataframe)
             yield final_dataframe
 
+    @staticmethod
     def store_data_nifi(self, df: pd.DataFrame):
         """
         Store the generated data in database through NiFi.

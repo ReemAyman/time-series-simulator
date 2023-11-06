@@ -35,4 +35,6 @@ class YamlSerializer:
             "seasonality": self.file["seasonality"],
             "cyclic_period": self.file["cyclic_period"],
             "cyclic_amplitude": self.file["cyclic_amplitude"],
+            "generator_id": self.file["generator_id"],
+            "feature_id": self.file["feature_id"]
         }

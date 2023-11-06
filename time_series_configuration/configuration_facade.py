@@ -125,3 +125,23 @@ class ConfigurationFacade:
         - str: The data type specified in the configuration, as a string.
         """
         return DataTypeEnum[self.reader.get_data("data_type")].value
+
+    @property
+    def generator_id(self):
+        """
+        Get the generator id from the configuration.
+
+        Returns:
+        - str: The generator id specified in the configuration, as a string.
+        """
+        return self.reader.get_data("generator_id")
+
+    @property
+    def feature_id(self):
+        """
+        Get the feature id from the configuration.
+
+        Returns:
+        - str: The feature id specified in the configuration, as a string.
+        """
+        return self.reader.get_data("feature_id")
