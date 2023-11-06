@@ -1,7 +1,9 @@
 from simulator_api.models import DatasetConfiguration, SimulationData
 from time_series_configuration.configuration_facade import ConfigurationFacade
 from time_series_configuration.configuration_reader.postgre_configuration_reader import PostgreReader
+from time_series_data_consumer.builder.consumer_builder_kafka import KafkaConsumerBuilder
 from time_series_data_consumer.consumer.time_series_data_consumer_kafka import TimeSeriesDataConsumerKafka
+from time_series_data_consumer.consumer_factory import ConsumerFactory
 from time_series_data_producer.builder.producer_builder_csv import CsvProducerBuilder
 from time_series_data_producer.builder.producer_builder_kafka import KafkaProducerBuilder
 from time_series_data_producer.producer_factory import ProducerFactory
@@ -42,6 +44,7 @@ def run_simulator(simulator_config, data_producer, simulator_id):
         list_of_configurators.append(ConfigurationFacade(PostgreReader(config_data)))
 
     simulator_director = TimeSeriesDirector(list_of_configurators)
+
     # Building the datasets according to the producer type.
     for i, dataset in enumerate(simulator_director.build()):
         producer_factory = ProducerFactory()
@@ -57,6 +60,11 @@ def run_simulator(simulator_config, data_producer, simulator_id):
                                                                               generator_id=list_of_configurators[i].generator_id, feature_id=list_of_configurators[i].feature_id))
             producer = producer_factory.create("kafka", topic=simulator_config["sink_id"],
                                                generator_id=list_of_configurators[i].generator_id, feature_id=list_of_configurators[i].feature_id)
-            consumer = TimeSeriesDataConsumerKafka(simulator_config["sink_id"], dataset.shape[0])
+
+            consumer_factory = ConsumerFactory()
+            kafka_consumer_builder = KafkaConsumerBuilder()
+            consumer_factory.register_builder("kafka", kafka_consumer_builder(topic=simulator_config["sink_id"], data_count=dataset.shape[0]))
+            consumer = consumer_factory.create("kafka", topic=simulator_config["sink_id"], data_count=dataset.shape[0])
+
             producer.store_data()
             consumer.consume_data()

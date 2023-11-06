@@ -1,18 +1,20 @@
-# class KafkaSerializer:
-#     def __init__(self, generated_data, generator_id, feature_id):
-#         self.generated_data = generated_data
-#         self.generator_id = generator_id
-#         self.feature_id = feature_id
-#
-#     def serialize(self):
-#         serialized_data = []
-#         for _, data_instance in self.generated_data.iterrows():
-#             serialized_data.append(
-#                 {
-#                     'attributeId': self.feature_id,
-#                     'value': data_instance['value'],
-#                     'timestamp': data_instance['timestamp'],
-#                     'assetId': self.generator_id
-#                 }
-#             )
-#         return serialized_data
+import json
+
+from kafka_message.kafka_message import TimeSeriesKafkaMessage
+from time_series_data_producer.producer_serializer.producer_serializer import ProducerSerializer
+
+
+class KafkaSerializer(ProducerSerializer):
+    """
+    A class for serializing kafka messages.
+    """
+    def __init__(self, kafka_message: TimeSeriesKafkaMessage):
+        super().__init__(kafka_message)
+
+    def serialize(self):
+        """
+        Serializing data as json for kafka producer.
+        Returns:
+            Json data as string representing kafka message.
+        """
+        return json.dumps(self.serializable.__dict__())

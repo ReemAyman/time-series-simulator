@@ -1,12 +1,9 @@
-import json
-
 from pandas import DataFrame
 from confluent_kafka import Producer
-# from confluent_kafka.schema_registry.json_schema import JSONSerializer
-# from confluent_kafka.serialization import StringSerializer
 
 from kafka_message.kafka_message import TimeSeriesKafkaMessage
 from time_series_data_producer.producer.time_series_data_producer import TimeSeriesDataProducer
+from time_series_data_producer.producer_serializer.producer_serializer_kafka import KafkaSerializer
 
 
 class TimeSeriesDataProducerKafka(TimeSeriesDataProducer):
@@ -38,7 +35,8 @@ class TimeSeriesDataProducerKafka(TimeSeriesDataProducer):
 
             time_series_kafka = TimeSeriesKafkaMessage(
                 self.feature_id, data_instance["value"], data_instance["timestamp"], self.generator_id)
-            value = json.dumps(time_series_kafka.__dict__())
+
+            value = KafkaSerializer(time_series_kafka).serialize()
             key = str(self.generator_id + self.feature_id + str(i))
 
             # Produce asynchronously with delivery callback
@@ -49,6 +47,12 @@ class TimeSeriesDataProducerKafka(TimeSeriesDataProducer):
 
     @staticmethod
     def delivery_callback(err, msg):
+        """
+        A callback for producing kafka messages.
+        Args:
+            err: error type.
+            msg: kafka message.
+        """
         if err:
             print('ERROR: Message failed delivery: {}'.format(err))
         else:
