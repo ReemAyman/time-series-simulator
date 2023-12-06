@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'simulator_api',
+    'graphene_django'
 ]
 
 MIDDLEWARE = [
@@ -150,4 +151,8 @@ REST_FRAMEWORK = {
     ),
     'SEARCH_PARAM': 'filter[search]',
 
+}
+
+GRAPHENE = {
+    "SCHEMA": "time_series_webserver.schema.schema"
 }

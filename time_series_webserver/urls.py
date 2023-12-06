@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from graphene_django.views import GraphQLView
 from rest_framework import routers
+
+from time_series_webserver.schema import schema
 
 router = routers.DefaultRouter()
 
@@ -23,5 +26,6 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path('admin/', admin.site.urls),
-    path('simulator_api/', include('simulator_api.urls'))
+    path('simulator_api/', include('simulator_api.urls')),
+    path("graphql", GraphQLView.as_view(graphiql=True, schema=schema)),
 ]

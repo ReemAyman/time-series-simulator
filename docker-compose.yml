@@ -36,7 +36,8 @@ services:
       - simulator-network
 # Simulator service
   sim-api:
-    image: simulator:1.0
+    build:
+      context: .
     container_name: time-series-gen
     command: >
       bash -c " python manage.py makemigrations
